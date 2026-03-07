@@ -19,6 +19,14 @@
                         <template #icon><icon-edit /></template>
                         ProForm 演示
                     </a-menu-item>
+                    <a-menu-item key="modal">
+                        <template #icon><icon-apps /></template>
+                        ProModal 演示
+                    </a-menu-item>
+                    <a-menu-item key="upload">
+                        <template #icon><icon-cloud-upload /></template>
+                        ProUpload 演示
+                    </a-menu-item>
                 </a-menu>
             </a-layout-sider>
 

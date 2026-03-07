@@ -4,5 +4,11 @@ import type { ProTableProps, ProColumnData, ProTableRequestApi } from './compone
 import ProForm from './components/ProForm/index.vue';
 import type { FormItemConfig, ProFormConfig, ProFormProps } from './components/ProForm/types';
 
-export { ProTable, ProForm };
-export type { ProTableProps, ProColumnData, ProTableRequestApi, FormItemConfig, ProFormConfig, ProFormProps };
+import ProModal from './components/ProModal/index.vue';
+import type { ProModalProps } from './components/ProModal/types';
+
+import { SingleUpload, MultipleUpload, useUploadQueue, useOSS, createS3Uploader } from './components/ProUpload/index';
+import type { OSSConfig, S3UploaderConfig } from './components/ProUpload/index';
+
+export { ProTable, ProForm, ProModal, SingleUpload, MultipleUpload, useUploadQueue, useOSS, createS3Uploader };
+export type { ProTableProps, ProColumnData, ProTableRequestApi, FormItemConfig, ProFormConfig, ProFormProps, ProModalProps, OSSConfig, S3UploaderConfig };

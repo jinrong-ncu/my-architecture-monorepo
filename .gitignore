@@ -2,3 +2,7 @@ prompt.txt
 node_modules
 dist
 .turbo
+
+# 环境变量文件（包含真实密锐，严禁提交到 Git）
+.env.local
+.env.*.local
