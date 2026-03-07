@@ -18,7 +18,7 @@
                 @mouseleave="card.hover = false">
                 <!-- 上传中：圆形进度 -->
                 <div v-if="card.status === 'uploading'" class="card-uploading">
-                    <a-progress type="circle" :percent="card.percent" :width="64" />
+                    <a-progress type="circle" :percent="card.percent / 100" :width="64" />
                     <span class="card-name">{{ card.name }}</span>
                 </div>
 

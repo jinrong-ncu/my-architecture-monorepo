@@ -2,37 +2,44 @@
     <div class="pro-single-upload" :class="{ 'is-disabled': disabled }">
         <a-upload :accept="accept" :limit="1" :show-file-list="false" :custom-request="handleCustomRequest"
             :disabled="disabled || !!innerValue">
-            <!-- 无文件时显示上传占位区 -->
-            <div v-if="!innerValue" class="upload-placeholder">
-                <component :is="icon || 'icon-upload'" class="placeholder-icon" />
-                <span class="placeholder-title">{{ title || '点击上传' }}</span>
-                <span class="placeholder-hint">{{ hint }}</span>
-            </div>
-
-            <!-- 有文件时渲染预览（禁用上传按钮，改走删除逻辑） -->
-            <div v-else class="upload-preview" @mouseenter="showDeleteMask = true" @mouseleave="showDeleteMask = false">
-                <!-- 图片预览 -->
-                <a-image v-if="isImage" :src="innerValue" :alt="title" fit="cover" width="100%" height="100%"
-                    :preview="false" style="border-radius: 4px;" />
-                <!-- 视频预览 -->
-                <video v-else-if="isVideo" :src="innerValue"
-                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" controls />
-                <!-- 通用文件（显示文件图标和名称） -->
-                <div v-else class="file-thumb">
-                    <icon-file style="font-size: 32px; color: var(--color-primary-6);" />
-                    <span class="file-thumb-name">{{ fileName }}</span>
+            <!--
+                #upload-button 插槽：完全替换 Arco 默认按钮
+                让整个正方形预览框成为点击触发器，而不是在正方形下面再多一个按钮
+            -->
+            <template #upload-button>
+                <!-- 无文件时显示上传占位区 -->
+                <div v-if="!innerValue" class="upload-placeholder">
+                    <component :is="icon || 'icon-upload'" class="placeholder-icon" />
+                    <span class="placeholder-title">{{ title || '点击上传' }}</span>
+                    <span v-if="hint" class="placeholder-hint">{{ hint }}</span>
                 </div>
 
-                <!-- 悬浮删除蒙层 -->
-                <div v-show="showDeleteMask" class="delete-mask" @click.stop="handleDelete">
-                    <icon-delete style="font-size: 22px; color: #fff;" />
+                <!-- 有文件时渲染预览（阻止点击触发上传，改走删除逻辑） -->
+                <div v-else class="upload-preview" @mouseenter="showDeleteMask = true"
+                    @mouseleave="showDeleteMask = false" @click.prevent.stop>
+                    <!-- 图片预览 -->
+                    <a-image v-if="isImage" :src="innerValue" :alt="title" fit="cover" width="100%" height="100%"
+                        :preview="false" style="border-radius: 4px;" />
+                    <!-- 视频预览 -->
+                    <video v-else-if="isVideo" :src="innerValue"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" controls />
+                    <!-- 通用文件（显示文件图标和名称） -->
+                    <div v-else class="file-thumb">
+                        <icon-file style="font-size: 32px; color: var(--color-primary-6);" />
+                        <span class="file-thumb-name">{{ fileName }}</span>
+                    </div>
+
+                    <!-- 悬浮删除蒙层 -->
+                    <div v-show="showDeleteMask" class="delete-mask" @click.stop="handleDelete">
+                        <icon-delete style="font-size: 22px; color: #fff;" />
+                    </div>
                 </div>
-            </div>
+            </template>
         </a-upload>
 
         <!-- 上传进度遮罩层 -->
         <div v-if="uploading" class="uploading-overlay">
-            <a-progress type="circle" :percent="uploadPercent" :width="80" status="normal" />
+            <a-progress type="circle" :percent="uploadPercent / 100" :width="80" status="normal" />
         </div>
     </div>
 </template>
@@ -157,9 +164,11 @@ async function handleCustomRequest(requestOption: RequestOption) {
     uploading.value = true;
     uploadPercent.value = 0;
 
+    // progressHandler 只更新内部进度条，不将数字馆增传给 Arco’s onProgress
+    // 原因：Arco onProgress 预期接收 [0,1] 小数，而 apiObj 馒回的是 [0,100]。
+    // 两者嵌套会导致 1000%，因此内部自行管理即可。
     const progressHandler = (percent: number) => {
         uploadPercent.value = percent;
-        onProgress(percent);
     };
 
     try {

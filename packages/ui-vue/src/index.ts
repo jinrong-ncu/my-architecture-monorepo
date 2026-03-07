@@ -7,8 +7,8 @@ import type { FormItemConfig, ProFormConfig, ProFormProps } from './components/P
 import ProModal from './components/ProModal/index.vue';
 import type { ProModalProps } from './components/ProModal/types';
 
-import { SingleUpload, MultipleUpload, useUploadQueue, useOSS, createS3Uploader } from './components/ProUpload/index';
+import { SingleUpload, MultipleUpload, ProUpload, useUploadQueue, useOSS, createS3Uploader } from './components/ProUpload/index';
 import type { OSSConfig, S3UploaderConfig } from './components/ProUpload/index';
 
-export { ProTable, ProForm, ProModal, SingleUpload, MultipleUpload, useUploadQueue, useOSS, createS3Uploader };
+export { ProTable, ProForm, ProModal, SingleUpload, MultipleUpload, ProUpload, useUploadQueue, useOSS, createS3Uploader };
 export type { ProTableProps, ProColumnData, ProTableRequestApi, FormItemConfig, ProFormConfig, ProFormProps, ProModalProps, OSSConfig, S3UploaderConfig };

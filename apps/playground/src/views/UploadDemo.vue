@@ -1,68 +1,69 @@
 <template>
     <div class="upload-demo">
-        <h3 style="margin-top: 0; margin-bottom: 24px;">ProUpload 高并发上传组件压测台</h3>
+        <h3 style="margin-top: 0; margin-bottom: 24px;">ProUpload 全模式上传组件压测台</h3>
 
         <a-space direction="vertical" :size="24" fill>
 
-            <!-- ======================== A. 单文件压测 ======================== -->
-            <a-card title="测试用例 A：SingleUpload 单文件直传" :bordered="true">
-                <template #extra>
-                    <a-tag color="arcoblue">图片/视频/文件 三态预览</a-tag>
-                </template>
-
+            <!-- ======================== A. avatar 头像上传 ======================== -->
+            <a-card title="模式 A：avatar — 用户头像单传">
+                <template #extra><a-tag color="arcoblue">single file · 正方形预览</a-tag></template>
                 <a-space :size="40" align="start">
-                    <!-- 头像上传 -->
                     <div>
-                        <p class="case-label">图片上传（头像场景）</p>
-                        <SingleUpload v-model="singleFileUrl" accept="image/*" :max-size="100" title="点击上传头像"
-                            icon="icon-plus" :api-obj="activeApi" />
+                        <p class="case-label">图片头像</p>
+                        <ProUpload v-model="avatarUrl" list-type="avatar" accept="image/*" :max-size="100"
+                            title="点击上传头像" :api-obj="activeApi" />
                     </div>
-                    <!-- 视频上传 -->
                     <div>
-                        <p class="case-label">视频上传（凭证场景）</p>
-                        <SingleUpload v-model="singleVideoUrl" accept="video/*" :max-size="150" title="上传视频文件"
-                            icon="icon-video-camera" :api-obj="activeApi" />
-                    </div>
-                    <!-- 文档上传 -->
-                    <div>
-                        <p class="case-label">文档上传（合同场景）</p>
-                        <SingleUpload v-model="singleDocUrl" accept=".pdf,.docx,.xlsx" :max-size="120" title="上传合同文件"
-                            icon="icon-file" :api-obj="activeApi" />
+                        <p class="case-label">文档凭证</p>
+                        <ProUpload v-model="docUrl" list-type="avatar" accept=".pdf,.docx,.xlsx" :max-size="120"
+                            title="上传合同文件" :api-obj="activeApi" />
                     </div>
                 </a-space>
             </a-card>
 
-            <!-- ======================== B. 多文件并发压测 ======================== -->
-            <a-card title="测试用例 B：MultipleUpload 高并发拖拽队列" :bordered="true">
-                <template #extra>
-                    <a-tag color="green">maxConcurrent=2 并发压测</a-tag>
-                </template>
+            <!-- ======================== B. picture-card 照片墙 ======================== -->
+            <a-card title="模式 B：picture-card — 照片墙相册">
+                <template #extra><a-tag color="green">multi file · grid 格</a-tag></template>
+                <ProUpload v-model="photoList" list-type="picture-card" accept="image/*" :max-size="20" :max-count="9"
+                    title="添加图片" :api-obj="activeApi" />
+            </a-card>
 
-                <a-alert type="info" style="margin-bottom: 16px;">
-                    <template #title>压测说明</template>
-                    一次性选择 4~6 个文件，观察同时上传的卡片进度——最多只有 2 个同时推进，
-                    其余卡片在进度 0% 处等待令牌释放后才开始滚动，这就是 <code>useUploadQueue</code> 并发调度引擎在运作。
-                </a-alert>
-
-                <MultipleUpload v-model="multipleFileList" drag :max-concurrent="2" :max-size="20"
+            <!-- ======================== C. picture-list 图片列表 ======================== -->
+            <a-card title="模式 C：picture-list — 图片+文件名列表">
+                <template #extra><a-tag color="orange">multi file · thumbnail list</a-tag></template>
+                <ProUpload v-model="pictureList" list-type="picture-list" :max-size="50" title="选择图片/文件"
                     :api-obj="activeApi" />
             </a-card>
 
+            <!-- ======================== D. text 文件列表 (drag) ======================== -->
+            <a-card title="模式 D：text — 拖拽上传文件列表（maxConcurrent=2）">
+                <template #extra><a-tag color="red">multi file · drag · 并发限制 2</a-tag></template>
+                <a-alert type="info" style="margin-bottom: 16px;">
+                    <template #title>并发压测</template>
+                    拖入 4~6 个文件，最多同时推进 2 个进度条，其余等待令牌释放——<code>useUploadQueue</code> 引擎在运作。
+                </a-alert>
+                <ProUpload v-model="fileList" list-type="text" drag :max-concurrent="2" :max-size="150"
+                    title="点击或拖拽文件到此处" :api-obj="activeApi" />
+            </a-card>
+
             <!-- ======================== 实时数据大屏 ======================== -->
-            <a-card title="实时数据大屏（v-model 双向绑定验证）" :bordered="true">
+            <a-card title="实时数据大屏（v-model 双向绑定验证）">
                 <a-row :gutter="16">
-                    <a-col :span="8">
-                        <p class="case-label">singleFileUrl（图片）</p>
-                        <pre class="data-snapshot">{{ JSON.stringify(singleFileUrl, null, 2) || 'null' }}</pre>
+                    <a-col :span="6">
+                        <p class="case-label">avatar URL</p>
+                        <pre class="snap">{{ JSON.stringify(avatarUrl) ?? 'null' }}</pre>
                     </a-col>
-                    <a-col :span="8">
-                        <p class="case-label">singleVideoUrl / singleDocUrl</p>
-                        <pre
-                            class="data-snapshot">{{ JSON.stringify({ video: singleVideoUrl, doc: singleDocUrl }, null, 2) }}</pre>
+                    <a-col :span="6">
+                        <p class="case-label">picture-card 数组</p>
+                        <pre class="snap">{{ JSON.stringify(photoList, null, 2) }}</pre>
                     </a-col>
-                    <a-col :span="8">
-                        <p class="case-label">multipleFileList（数组）</p>
-                        <pre class="data-snapshot">{{ JSON.stringify(multipleFileList, null, 2) || '[]' }}</pre>
+                    <a-col :span="6">
+                        <p class="case-label">picture-list 数组</p>
+                        <pre class="snap">{{ JSON.stringify(pictureList, null, 2) }}</pre>
+                    </a-col>
+                    <a-col :span="6">
+                        <p class="case-label">text 文件列表</p>
+                        <pre class="snap">{{ JSON.stringify(fileList, null, 2) }}</pre>
                     </a-col>
                 </a-row>
             </a-card>
@@ -73,43 +74,35 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { SingleUpload, MultipleUpload, createS3Uploader } from '@rong/ui-vue';
+import { ProUpload, createS3Uploader } from '@rong/ui-vue';
 
 // ==========================================
-// 1. 响应式数据绑定
+// 绑定数据
 // ==========================================
-const singleFileUrl = ref<string | undefined>(undefined);
-const singleVideoUrl = ref<string | undefined>(undefined);
-const singleDocUrl = ref<string | undefined>(undefined);
-const multipleFileList = ref<any[]>([]);
+const avatarUrl = ref<string | undefined>(undefined);
+const docUrl = ref<string | undefined>(undefined);
+const photoList = ref<any[]>([]);
+const pictureList = ref<any[]>([]);
+const fileList = ref<any[]>([]);
 
 // ==========================================
-// 2a. 真实 R2/S3 上传 API（从 .env.local 读取配置）
+// 真实 S3/R2 上传 API
 // ==========================================
 const realUploadApi = createS3Uploader();
 
-// ==========================================
-// 2b. Mock API（备用，切换为此可在本地离线压测）
-// ==========================================
-function mockUploadApi(file: File, onProgress: (percent: number) => void): Promise<{ url: string }> {
-    return new Promise((resolve) => {
-        let percent = 0;
-        const timer = setInterval(() => {
-            percent += 10;
-            onProgress(Math.min(percent, 100));
-            if (percent >= 100) {
-                clearInterval(timer);
-                resolve({ url: `https://picsum.photos/200/200?random=${Math.random()}` });
-            }
+// Mock API（.env.local 未配置时自动降级）
+function mockUploadApi(file: File, onProgress: (p: number) => void): Promise<{ url: string }> {
+    return new Promise(resolve => {
+        let p = 0;
+        const t = setInterval(() => {
+            p += 10; onProgress(Math.min(p, 100));
+            if (p >= 100) { clearInterval(t); resolve({ url: `https://picsum.photos/200/200?random=${Math.random()}` }); }
         }, 300);
     });
 }
 
-// 自动检测：若 .env.local 尚未填写真实密钥，则降级使用 Mock API 进行离线压测
-const envAccessKey = ((import.meta as any).env?.VITE_S3_ACCESS_KEY_ID ?? '') as string;
-const activeApi = (!envAccessKey || envAccessKey.startsWith('你'))
-    ? mockUploadApi
-    : realUploadApi;
+const envKey = ((import.meta as any).env?.VITE_S3_ACCESS_KEY_ID ?? '') as string;
+const activeApi = (!envKey || envKey.startsWith('你')) ? mockUploadApi : realUploadApi;
 </script>
 
 <style scoped>
@@ -124,19 +117,18 @@ const activeApi = (!envAccessKey || envAccessKey.startsWith('你'))
     color: var(--color-text-2);
 }
 
-.data-snapshot {
+.snap {
     background: var(--color-fill-2);
     border: 1px solid var(--color-border-2);
     border-radius: 4px;
-    padding: 12px;
-    font-size: 12px;
+    padding: 10px;
+    font-size: 11px;
     line-height: 1.7;
     white-space: pre-wrap;
     word-break: break-all;
-    min-height: 80px;
-    max-height: 240px;
+    min-height: 60px;
+    max-height: 200px;
     overflow-y: auto;
-    color: var(--color-text-1);
     margin: 0;
 }
 
