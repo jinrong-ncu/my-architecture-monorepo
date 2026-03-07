@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        // 目标代码语法版本为最新的 ECMAScript 规范
+        "target": "ESNext",
+        // 模块系统使用最新的 ES 模块规范
+        "module": "ESNext",
+        // 采用与 Node.js 16 及以上版本一致的模块解析策略，支持 exports 等特性
+        "moduleResolution": "node",
+        // 允许项目直接作为模块导入 JSON 文件
+        "resolveJsonModule": true,
+        // 开启所有严格的类型检查：包含不允许隐式 any 或 this、严格的 Null 检查等，这是企业级底层必需的约束
+        "strict": true,
+        // 将代码转换相关的辅助代码提取出来引入，不需要每个文件内联写入，显著减小单包体积
+        "importHelpers": true,
+        // 提供 CommonJS 和 ES Module 互操作的默认导入支持
+        "esModuleInterop": true,
+        // 允许启用装饰器特性（如 Vue class 组件或 NestJS 中常用）
+        "experimentalDecorators": true,
+        // 禁用对全局声明文件和所有 node_modules 等第三方依赖库内部产生的类型错误进行检查，极速提升 TS 编译耗时
+        "skipLibCheck": true,
+        // 跨平台（MacOS vs Linux）协作时强制检查文件名大小写，避免本地打包正常而 CI/CD 上因 Unix 大小写敏感报错
+        "forceConsistentCasingInFileNames": true,
+        // 生成 source map，以方便出现问题时排查映射关系
+        "sourceMap": true,
+        // 不发射实际结果产出，只负责检查
+        "noEmit": true
+    }
+}
