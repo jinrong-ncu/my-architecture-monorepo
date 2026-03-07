@@ -3,7 +3,7 @@ packages:
   - 'apps/*'
   # 核心工具与业务组件包目录：存放 CLI、封装请求库、纯逻辑库、UI 库（跨端共用）
   - 'packages/*'
-  # 项目预设模板目录：用于提供 CLI 初始化能力的基础模板（例如 admin, ssr 等）
-  - 'templates/*'
+  # # 项目预设模板目录：用于提供 CLI 初始化能力的基础模板（例如 admin, ssr 等）
+  # - 'templates/*'
   # 自动化工程规范脚本目录：存放批量重命名、批量发布等 Node 脚本
   - 'scripts'
