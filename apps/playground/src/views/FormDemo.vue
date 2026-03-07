@@ -40,8 +40,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { ProForm } from '@rong/ui-vue';
-import type { FormItemConfig, ProFormConfig } from '@rong/ui-vue';
-
+import { FormItemConfig, ProFormConfig, createS3Uploader } from '@rong/ui-vue';
+const realUploadApi = createS3Uploader();
 // ==========================================
 // 1. 状态定义
 // ==========================================
@@ -234,7 +234,13 @@ const formItems: FormItemConfig[] = [
         name: 'avatar',
         label: '头像上传',
         span: 24,
-        options: { listType: 'picture-card', limit: 1, accept: 'image/*', tip: '仅支持图片格式' }
+        options: {
+            listType: 'picture-card', limit: 1, accept: 'image/*', tip: '仅支持图片格式',
+            apiObj: realUploadApi,   // ← 直接传 createS3Uploader() 的返回值
+            maxSize: 115,
+            title: '点击上传头像',
+            icon: 'icon-camera',
+        }
     },
 
     // --- 分组五：自定义插槽 ---

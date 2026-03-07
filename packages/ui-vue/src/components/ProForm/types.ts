@@ -1,4 +1,5 @@
 import type { FieldRule } from '@arco-design/web-vue';
+import type { OSSConfig } from '../ProUpload/hooks/useOSS';
 
 // ==========================================
 // 1. 核心表单项的配置类型协议
@@ -98,6 +99,18 @@ export interface FormItemConfig {
         step?: number;           // slider / number 步长
         allowHalf?: boolean;     // rate 是否允许半星
         count?: number;          // rate 最大值
+
+        /**
+         * [upload 专用] 自定义上传函数，传入文件和进度回调，返回包含 url 的对象
+         * 与 ossConfig 二选一
+         */
+        apiObj?: (file: File, onProgress: (p: number) => void) => Promise<any>;
+
+        /**
+         * [upload 专用] 云存储 OSS 直传配置，如 Cloudflare R2 / S3
+         * 与 apiObj 二选一
+         */
+        ossConfig?: OSSConfig;
 
         /**
          * 用于 select / radio / checkbox / cascader 的数据源

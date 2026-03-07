@@ -132,9 +132,9 @@
                                 </div>
                             </template>
 
-                            <!-- upload 文件上传（通过 ProUpload 封装） -->
+                            <!-- upload 文件上传（通过 SingleUpload 封装，支持 apiObj / ossConfig / 进度覆盖层 / 预览删除） -->
                             <template v-else-if="item.component === 'upload'">
-                                <ProUpload v-model="getModelRef(item).value" v-bind="item.options || {}" />
+                                <SingleUpload v-model="getModelRef(item).value" v-bind="item.options || {}" />
                             </template>
 
                             <!-- 兜底：任何未识别 component 字符串 => 渲染具名插槽 -->
@@ -162,7 +162,7 @@
 <script setup lang="ts">
 import { ref, watch, reactive, onMounted } from 'vue';
 import type { FormItemConfig, ProFormProps } from './types';
-import ProUpload from './ProUpload.vue';
+import { SingleUpload } from '../ProUpload';
 
 // ==========================================
 // 1. Props & Emits
