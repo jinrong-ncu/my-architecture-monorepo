@@ -88,4 +88,14 @@ export interface ProTableProps {
      * 表格的列配置，继承于 Arco Design 原生配置并扩展了 search 等属性
      */
     columns: ProColumnData[];
+
+    /**
+     * 表格的滚动配置 (如配置项有固定列，建议指定 scroll.x)
+     */
+    scroll?: {
+        x?: number | string;
+        y?: number | string;
+        minWidth?: number | string;
+        maxHeight?: number | string;
+    };
 }

@@ -2,8 +2,8 @@
     <div class="rong-pro-table">
         <!-- 顶部搜索表单区域 -->
         <div class="pro-table-search" v-if="searchColumns.length > 0">
-            <a-form :model="searchModel" layout="horizontal" @submit="handleSearch">
-                <a-grid :cols="{ xs: 1, sm: 2, md: 3, lg: 4, xl: 4 }" :col-gap="16" :row-gap="16">
+            <a-form :model="searchModel" layout="horizontal" auto-label-width @submit="handleSearch">
+                <a-grid :cols="{ xs: 1, sm: 2, md: 3, lg: 4, xl: 4 }" :col-gap="10" :row-gap="10">
                     <a-grid-item v-for="col in searchColumns" :key="col.dataIndex">
                         <a-form-item :field="col.dataIndex" :label="col.title">
 
@@ -39,12 +39,12 @@
 
         <!-- 底部数据表格展示区域 -->
         <div class="pro-table-content">
-            <a-table :data="tableData" :loading="loading" :pagination="pagination" @page-change="handlePageChange"
-                @page-size-change="handlePageSizeChange">
+            <a-table :data="tableData" :loading="loading" :pagination="pagination" :scroll="computedScroll"
+                @page-change="handlePageChange" @page-size-change="handlePageSizeChange">
 
                 <template #columns>
                     <a-table-column v-for="col in tableColumns" :key="col.dataIndex" :title="col.title"
-                        :data-index="col.dataIndex" :width="col.width" :align="col.align">
+                        :data-index="col.dataIndex" :width="col.width" :align="col.align" :fixed="col.fixed">
 
                         <!-- 拦截表头插槽：实现 tooltip 增强 -->
                         <template #title>
@@ -228,6 +228,18 @@ const tableColumns = computed(() => {
         }
         return col;
     });
+});
+
+// 计算自适应的滚动维度配置：如果业务没传，但是配置有 fixed 列，则提供 max-content 给 Arco 以激活固定列机制
+const computedScroll = computed(() => {
+    if (props.scroll) {
+        return props.scroll;
+    }
+    const hasFixed = props.columns.some(col => !!col.fixed);
+    if (hasFixed) {
+        return { x: 'max-content' };
+    }
+    return undefined;
 });
 
 // ==========================================
