@@ -1,0 +1,18 @@
+{
+    "name": "@rong/ui-vue",
+    "version": "1.0.0",
+    "description": "基于 Vue3 + Arco Design 的企业级高阶组件库",
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "peerDependencies": {
+        "@arco-design/web-vue": "^2.40.0",
+        "vue": "^3.3.0"
+    },
+    "devDependencies": {
+        "@arco-design/web-vue": "^2.53.0",
+        "vue": "^3.3.0"
+    },
+    "dependencies": {
+        "dayjs": "^1.11.19"
+    }
+}

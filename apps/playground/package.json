@@ -1,0 +1,21 @@
+{
+    "name": "@rong/playground",
+    "version": "1.0.0",
+    "private": true,
+    "description": "基于 Vite + Vue3 的本地测试沙箱，用于联调测试框架组件包。",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@arco-design/web-vue": "^2.53.0",
+        "@rong/ui-vue": "workspace:*",
+        "vue": "^3.3.0"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^4.2.3",
+        "typescript": "^5.0.2",
+        "vite": "^4.4.5"
+    }
+}
