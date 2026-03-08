@@ -157,4 +157,11 @@ export interface ProFormProps {
 
     /** 表单全局配置 */
     config?: ProFormConfig;
+
+    /**
+     * 全局只读模式：
+     * - true  => 进入“详情查看态”，渲染纯文本，不展示底部操作区
+     * - false => 默认编辑态
+     */
+    readonly?: boolean;
 }

@@ -1,6 +1,10 @@
 <template>
     <div class="form-demo">
-        <h3 style="margin-top: 0; margin-bottom: 20px;">ProForm 全字段配置引擎压测</h3>
+        <h3 style="margin-top: 0; margin-bottom: 20px;">ProForm 同源渲染：编辑态 / 只读态 对照演示</h3>
+
+        <a-space style="margin-bottom: 16px;">
+            <a-button @click="resetDemoData">重置演示数据</a-button>
+        </a-space>
 
         <!-- 当前表单数据快照 -->
         <a-alert type="info" style="margin-bottom: 20px;">
@@ -9,31 +13,42 @@
                 JSON.stringify(formData, null, 2) }}</pre>
         </a-alert>
 
-        <!-- 核心 ProForm 引擎 -->
-        <ProForm ref="proFormRef" v-model="formData" :items="formItems" :config="formConfig">
+        <a-row :gutter="16">
+            <a-col :span="12">
+                <a-card title="编辑态（可交互）" :bordered="true">
+                    <ProForm ref="proFormRef" v-model="formData" :items="formItems" :config="formConfig" :readonly="false">
 
-            <!-- 自定义 slot 插槽演示（component: 'customWidget'） -->
-            <template #customWidget="{ modelRef }">
-                <a-input-tag v-model="modelRef.value" placeholder="回车添加标签" allow-clear />
-            </template>
+                        <!-- 自定义 slot 插槽演示（component: 'customWidget'） -->
+                        <template #customWidget="{ modelRef }">
+                            <a-input-tag v-model="modelRef.value" placeholder="回车添加标签" allow-clear />
+                        </template>
 
-            <!-- 操作按钮行 -->
-            <template #action="{ form }">
-                <a-space style="margin-top: 8px;">
-                    <a-button type="primary" @click="handleValidate(form)">
-                        <template #icon><icon-check /></template>
-                        提交并鉴权
-                    </a-button>
-                    <a-button @click="form.resetFields()">
-                        <template #icon><icon-refresh /></template>
-                        重置
-                    </a-button>
-                    <a-button status="warning" @click="form.clearValidate()">
-                        清除提示
-                    </a-button>
-                </a-space>
-            </template>
-        </ProForm>
+                        <!-- 操作按钮行：readonly=true 时会被 ProForm 自动隐藏 -->
+                        <template #action="{ form }">
+                            <a-space style="margin-top: 8px;">
+                                <a-button type="primary" @click="handleValidate(form)">
+                                    <template #icon><icon-check /></template>
+                                    提交并鉴权
+                                </a-button>
+                                <a-button @click="form.resetFields()">
+                                    <template #icon><icon-refresh /></template>
+                                    重置
+                                </a-button>
+                                <a-button status="warning" @click="form.clearValidate()">
+                                    清除提示
+                                </a-button>
+                            </a-space>
+                        </template>
+                    </ProForm>
+                </a-card>
+            </a-col>
+
+            <a-col :span="12">
+                <a-card title="只读态（同源渲染）" :bordered="true">
+                    <ProForm v-model="formData" :items="formItems" :config="formConfig" :readonly="true" />
+                </a-card>
+            </a-col>
+        </a-row>
     </div>
 </template>
 
@@ -42,12 +57,35 @@ import { ref } from 'vue';
 import { ProForm } from 'rongshiyi-ui-vue';
 import { FormItemConfig, ProFormConfig, createS3Uploader } from 'rongshiyi-ui-vue';
 const realUploadApi = createS3Uploader();
+
+const makeDemoFormData = () => ({
+    customerType: 'person',
+    name: '张三',
+    idType: 'id_card',
+    enterpriseName: '',
+    userInfo: {
+        phone: '13800138000',
+        email: 'zhangsan@example.com'
+    },
+    birthday: '1993-07-16',
+    age: 32,
+    satisfaction: 4.5,
+    progress: 80,
+    interests: ['vue3', 'nodejs', 'go'],
+    themeColor: '#165DFF',
+    receiveNotify: true,
+    keywords: ['中后台', 'ProForm', 'Schema'],
+    avatar: [
+        { name: 'avatar.png', url: 'https://cdn.example.com/uploads/avatar.png' },
+        'https://cdn.example.com/uploads/id-card-front.jpg'
+    ],
+    customTags: ['可配置', '可扩展']
+});
+
 // ==========================================
 // 1. 状态定义
 // ==========================================
-const formData = ref<Record<string, any>>({
-    userInfo: {}  // 为 nested binding 的 userInfo 预建容器
-});
+const formData = ref<Record<string, any>>(makeDemoFormData());
 const proFormRef = ref();
 
 // ==========================================
@@ -268,6 +306,10 @@ const handleValidate = async (formInstance: any) => {
         return;
     }
     console.log('【校验通过】payload:', formData.value);
+};
+
+const resetDemoData = () => {
+    formData.value = makeDemoFormData();
 };
 </script>
 

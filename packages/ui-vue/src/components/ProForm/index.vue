@@ -28,10 +28,31 @@
                                 </a-tooltip>
                             </template>
 
+                            <!-- 只读模式：统一走同源 schema 的文本渲染引擎，不使用 disabled 灰态控件 -->
+                            <template v-if="props.readonly">
+                                <!-- upload 详情态：结构化展示（缩略图/文件名），避免只显示一串文本 -->
+                                <template v-if="item.component === 'upload'">
+                                    <div v-if="getReadonlyUploadFiles(getModelRef(item).value).length" class="pro-form-readonly-upload">
+                                        <div v-for="(file, idx) in getReadonlyUploadFiles(getModelRef(item).value)"
+                                            :key="file.url || file.name || idx" class="pro-form-readonly-upload__item">
+                                            <a-image v-if="file.isImage && file.url" :src="file.url" :width="56" :height="56"
+                                                fit="cover" style="border-radius: 4px; flex-shrink: 0;" />
+                                            <icon-file v-else class="pro-form-readonly-upload__icon" />
+                                            <a-link v-if="file.url" :href="file.url" target="_blank" class="pro-form-readonly-upload__name">
+                                                {{ file.name }}
+                                            </a-link>
+                                            <span v-else class="pro-form-readonly-upload__name">{{ file.name }}</span>
+                                        </div>
+                                    </div>
+                                    <div v-else class="pro-form-readonly-text">-</div>
+                                </template>
+                                <div v-else class="pro-form-readonly-text">{{ renderReadonlyText(item, getModelRef(item).value) }}</div>
+                            </template>
+
                             <!-- ======= 内部组件智能分发 ======= -->
 
                             <!-- input 单行文本框 -->
-                            <template v-if="item.component === 'input'">
+                            <template v-else-if="item.component === 'input'">
                                 <a-input v-model="getModelRef(item).value" :placeholder="item.options?.placeholder"
                                     :disabled="item.options?.disabled" :type="item.options?.type"
                                     :max-length="item.options?.maxlength" allow-clear />
@@ -153,7 +174,7 @@
             </a-row>
 
             <!-- 行动区插槽，用于放置提交/重置按钮 -->
-            <div class="pro-form-actions">
+            <div v-if="!props.readonly" class="pro-form-actions">
                 <slot name="action" :form="formRef" :model="formData" />
             </div>
         </a-form>
@@ -263,6 +284,297 @@ function getModelRef(item: FormItemConfig) {
         get value() { return formData[parent]; },
         set value(v: any) { formData[parent] = v; }
     };
+}
+
+/**
+ * 判断值是否为空。
+ * - undefined / null / 空字符串 / 空数组 都视为“空”
+ */
+function isEmptyValue(value: unknown): boolean {
+    if (value === undefined || value === null) return true;
+    if (typeof value === 'string' && value.trim() === '') return true;
+    if (Array.isArray(value) && value.length === 0) return true;
+    return false;
+}
+
+/**
+ * 宽松比较 value：优先严格相等，兜底走字符串比较。
+ * 解决后端返回 number、前端 options 用 string 的常见不一致问题。
+ */
+function isSameValue(left: unknown, right: unknown): boolean {
+    return left === right || String(left) === String(right);
+}
+
+/**
+ * 在 options 中查找 value 对应的 label。
+ * 仅命中同层级数据，返回 undefined 代表未匹配。
+ */
+function findLabelByValue(
+    options: Array<{ label: string; value: any }> = [],
+    targetValue: unknown,
+): string | undefined {
+    const matched = options.find(option => isSameValue(option.value, targetValue));
+    return matched?.label;
+}
+
+/**
+ * 将任意值渲染为可读文本（兜底策略）。
+ * - Date 对象：转 ISO 字符串
+ * - 数组：以“、”连接
+ * - 其它：String(value)
+ */
+function toDisplayText(value: unknown): string {
+    if (value instanceof Date) return value.toISOString();
+    if (Array.isArray(value)) return value.join('、');
+    return String(value);
+}
+
+/**
+ * 将日期值转换为文本。
+ *
+ * 兼容场景：
+ * - 原生 Date
+ * - Dayjs（Arco DatePicker 常见返回对象，具备 format 方法）
+ * - 字符串/数字时间戳
+ */
+function formatDateText(value: unknown, format?: string): string {
+    const targetFormat = format || 'YYYY-MM-DD';
+
+    // Dayjs-like: 通过鸭子类型识别，避免额外引入依赖。
+    if (value && typeof value === 'object' && 'format' in (value as Record<string, any>)) {
+        const dayjsLike = value as { format: (fmt?: string) => string };
+        const text = dayjsLike.format?.(targetFormat);
+        return text?.trim() ? text : '-';
+    }
+
+    if (value instanceof Date) {
+        const year = value.getFullYear();
+        const month = String(value.getMonth() + 1).padStart(2, '0');
+        const day = String(value.getDate()).padStart(2, '0');
+        const hour = String(value.getHours()).padStart(2, '0');
+        const minute = String(value.getMinutes()).padStart(2, '0');
+        const second = String(value.getSeconds()).padStart(2, '0');
+
+        // 未引入日期库时，做一个最小可用的 format 替换。
+        return targetFormat
+            .replace(/YYYY/g, String(year))
+            .replace(/MM/g, month)
+            .replace(/DD/g, day)
+            .replace(/HH/g, hour)
+            .replace(/mm/g, minute)
+            .replace(/ss/g, second);
+    }
+
+    return toDisplayText(value);
+}
+
+/**
+ * 根据 cascader 的 value 路径，解析对应的 label 路径。
+ * 例如 value: ["zj", "hz"] => "浙江 / 杭州"
+ */
+function getCascaderPathLabel(
+    options: Array<{ label: string; value: any; children?: any[] }> = [],
+    pathValues: unknown,
+): string {
+    if (!Array.isArray(pathValues) || pathValues.length === 0) return '-';
+
+    const labels: string[] = [];
+    let currentOptions = options;
+
+    for (const value of pathValues) {
+        const matched = currentOptions.find(option => isSameValue(option.value, value));
+        if (!matched) return '-';
+        labels.push(matched.label);
+        currentOptions = Array.isArray(matched.children) ? matched.children : [];
+    }
+
+    return labels.length ? labels.join(' / ') : '-';
+}
+
+/**
+ * 从 URL/path 中提取文件名。
+ * 若无法提取，返回原始文本。
+ */
+function extractFileNameFromPath(path: string): string {
+    const trimmed = path.trim();
+    if (!trimmed) return '';
+
+    // 去掉 query / hash 后再取最后一段
+    const cleanPath = trimmed.split('?')[0].split('#')[0];
+    const name = cleanPath.split('/').pop() || cleanPath;
+
+    try {
+        return decodeURIComponent(name);
+    } catch {
+        return name;
+    }
+}
+
+/**
+ * 从 upload 单个条目提取可读名称。
+ *
+ * 兼容常见数据：
+ * - string: 直接视为 URL 或文件路径
+ * - object: 优先 name/fileName/filename/title，再回退 url/path
+ */
+function getUploadItemText(fileItem: unknown): string {
+    if (typeof fileItem === 'string') {
+        return extractFileNameFromPath(fileItem) || '-';
+    }
+
+    if (!fileItem || typeof fileItem !== 'object') return '-';
+
+    const data = fileItem as Record<string, any>;
+    const directName = data.name || data.fileName || data.filename || data.title;
+    if (typeof directName === 'string' && directName.trim()) return directName.trim();
+
+    const pathLike = data.url || data.path || data.fileUrl || data.file_path;
+    if (typeof pathLike === 'string' && pathLike.trim()) {
+        return extractFileNameFromPath(pathLike) || '-';
+    }
+
+    return '-';
+}
+
+/**
+ * 只读上传展示项。
+ */
+interface ReadonlyUploadFile {
+    name: string;
+    url?: string;
+    isImage: boolean;
+}
+
+/**
+ * 判断 url/path 是否为图片资源。
+ */
+function isImagePath(path?: string): boolean {
+    if (!path) return false;
+    return /\.(png|jpg|jpeg|gif|webp|svg|bmp)(\?.*)?$/i.test(path);
+}
+
+/**
+ * 将 upload 的任意值归一化为可读展示数组。
+ * 支持 string / object / array 三种输入。
+ */
+function getReadonlyUploadFiles(rawValue: unknown): ReadonlyUploadFile[] {
+    if (isEmptyValue(rawValue)) return [];
+
+    const list = Array.isArray(rawValue) ? rawValue : [rawValue];
+
+    return list
+        .map((fileItem): ReadonlyUploadFile | null => {
+            if (typeof fileItem === 'string') {
+                const url = fileItem.trim();
+                if (!url) return null;
+                return {
+                    name: extractFileNameFromPath(url) || '未命名文件',
+                    url,
+                    isImage: isImagePath(url),
+                };
+            }
+
+            if (!fileItem || typeof fileItem !== 'object') return null;
+
+            const data = fileItem as Record<string, any>;
+            const url = (data.url || data.path || data.fileUrl || data.file_path || '').toString().trim() || undefined;
+            const name = (typeof data.name === 'string' && data.name.trim())
+                || (typeof data.fileName === 'string' && data.fileName.trim())
+                || (typeof data.filename === 'string' && data.filename.trim())
+                || (typeof data.title === 'string' && data.title.trim())
+                || (url ? extractFileNameFromPath(url) : '')
+                || '未命名文件';
+
+            return {
+                name,
+                url,
+                isImage: isImagePath(url),
+            };
+        })
+        .filter((item): item is ReadonlyUploadFile => !!item);
+}
+
+/**
+ * 只读模式文本渲染引擎。
+ *
+ * 目标：复用 ProForm Schema 的同源配置能力，避免详情页重复写字典翻译逻辑。
+ * 规则：
+ * 1) 输入类（input/textarea/number/date/tags 等）=> 直接转纯文本
+ * 2) 选择类（select/radio/checkboxGroup）=> 用 options.items 做 value -> label 翻译
+ * 3) 空值、未匹配值 => 返回 "-"
+ */
+function renderReadonlyText(item: FormItemConfig, rawValue: unknown): string {
+    // 统一空态兜底，保证详情页视觉稳定。
+    if (isEmptyValue(rawValue)) return '-';
+
+    const component = item.component;
+    const options = item.options?.items || [];
+
+    // 选择类：优先做字典翻译。
+    if (component === 'select' || component === 'radio' || component === 'checkboxGroup') {
+        if (Array.isArray(rawValue)) {
+            const labels = rawValue
+                .map(value => findLabelByValue(options, value))
+                .filter((label): label is string => !!label && label.trim().length > 0);
+            return labels.length ? labels.join('、') : '-';
+        }
+
+        const label = findLabelByValue(options, rawValue);
+        return label && label.trim().length > 0 ? label : '-';
+    }
+
+    // cascader：将路径 value 翻译成“父 / 子 / 孙”文本。
+    if (component === 'cascader') {
+        if (!Array.isArray(rawValue)) return '-';
+
+        // multiple 模式下，常见值为二维数组：[[a,b], [c,d]]
+        if (rawValue.length > 0 && Array.isArray(rawValue[0])) {
+            const pathTexts = (rawValue as unknown[])
+                .map(path => getCascaderPathLabel(options, path))
+                .filter(text => text !== '-');
+            return pathTexts.length ? pathTexts.join('；') : '-';
+        }
+
+        // 单选模式：值是一维路径数组 [a,b,c]
+        return getCascaderPathLabel(options, rawValue);
+    }
+
+    // date：优先按 schema.format 输出，未配置时默认 YYYY-MM-DD。
+    if (component === 'date') {
+        if (Array.isArray(rawValue)) {
+            const list = rawValue
+                .map(value => formatDateText(value, item.options?.format))
+                .filter(text => text !== '-');
+            return list.length ? list.join(' ~ ') : '-';
+        }
+        return formatDateText(rawValue, item.options?.format);
+    }
+
+    // upload：统一提取“文件可读名称”，支持 string / object / array。
+    if (component === 'upload') {
+        if (Array.isArray(rawValue)) {
+            const names = rawValue
+                .map(fileItem => getUploadItemText(fileItem))
+                .filter(name => name !== '-');
+            return names.length ? names.join('、') : '-';
+        }
+
+        return getUploadItemText(rawValue);
+    }
+
+    // 单个 checkbox 常见值为 boolean，做更友好的中文展示。
+    if (component === 'checkbox') {
+        return rawValue ? '是' : '否';
+    }
+
+    // 开关组件在详情态中同样建议输出中文语义。
+    if (component === 'switch') {
+        return rawValue ? '开启' : '关闭';
+    }
+
+    // 其余输入类组件统一走文本兜底。
+    const text = toDisplayText(rawValue);
+    return text.trim() ? text : '-';
 }
 
 // ==========================================
@@ -417,5 +729,39 @@ defineExpose({
     margin-top: 16px;
     display: flex;
     justify-content: flex-start;
+}
+
+/* 只读模式文本：避免 disabled 灰态带来的低可读性 */
+.pro-form-readonly-text {
+    min-height: 32px;
+    line-height: 32px;
+    color: var(--color-text-1);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* 只读上传列表：图片缩略图 + 文件名，增强详情可读性 */
+.pro-form-readonly-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.pro-form-readonly-upload__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pro-form-readonly-upload__icon {
+    font-size: 22px;
+    color: var(--color-text-3);
+    flex-shrink: 0;
+}
+
+.pro-form-readonly-upload__name {
+    color: var(--color-text-1);
+    word-break: break-all;
 }
 </style>
