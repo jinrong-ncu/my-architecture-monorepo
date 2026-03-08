@@ -21,7 +21,8 @@
                     <!-- 完成：图片预览 -->
                     <template v-else-if="item.status === 'done'">
                         <a-image v-if="item.isImage" :src="item.url" fit="cover" width="100%" height="100%"
-                            :preview="!item.hover" style="display: block; border-radius: 4px;" />
+                            :preview="false"
+                            style="display: block; border-radius: 4px;" />
                         <div v-else class="card-file-placeholder">
                             <icon-file style="font-size: 26px; color: var(--color-primary-6)" />
                             <span class="card-filename">{{ item.name }}</span>
@@ -35,7 +36,10 @@
                     <!-- 操作蒙层（悬浮显示） -->
                     <div v-show="item.hover && item.status === 'done'" class="card-mask">
                         <a-space :size="8">
-                            <a-link @click.stop="removeCard(item.uid)">
+                            <a-link class="card-action-link" @click.stop="previewCard(item)">
+                                <icon-eye style="color: #fff; font-size: 16px;" />
+                            </a-link>
+                            <a-link class="card-action-link" @click.stop="removeCard(item.uid)">
                                 <icon-delete style="color: #fff; font-size: 16px;" />
                             </a-link>
                         </a-space>
@@ -103,6 +107,9 @@
                 </li>
             </ul>
         </template>
+
+        <a-image-preview-group :src-list="previewImageList" :visible="previewVisible" :current="previewCurrent"
+            :infinite="true" @update:visible="handlePreviewVisibleChange" @update:current="handlePreviewCurrentChange" />
 
     </div>
 </template>
@@ -182,6 +189,8 @@ interface FileCard {
     rawResult?: any;
 }
 const fileCards = ref<FileCard[]>([]);
+const previewVisible = ref(false);
+const previewCurrent = ref(0);
 
 // ==========================================
 // 3. avatar 模式：简单的 string 绑定
@@ -198,6 +207,60 @@ function onSingleUpdate(v: string | Record<string, any> | undefined) {
 // ==========================================
 const IMAGE_EXTS = /\.(png|jpg|jpeg|gif|webp|svg|bmp)(\?.*)?$/i;
 function isImageFile(name: string) { return IMAGE_EXTS.test(name); }
+
+function extractFileName(path: string): string {
+    const cleanPath = String(path || '').split('?')[0].split('#')[0];
+    const fileName = cleanPath.split('/').pop() || cleanPath;
+    try {
+        return decodeURIComponent(fileName);
+    } catch {
+        return fileName;
+    }
+}
+
+/**
+ * 将外部 modelValue 归一化成内部 fileCards，保障编辑态可回显已有文件。
+ */
+function normalizeModelValueToCards(modelValue?: string | any[]): FileCard[] {
+    if (!Array.isArray(modelValue) || modelValue.length === 0) return [];
+
+    return modelValue
+        .map((item, index): FileCard | null => {
+            if (typeof item === 'string') {
+                const url = item;
+                const name = extractFileName(url) || `file-${index + 1}`;
+                return {
+                    uid: `preset-${index}-${name}`,
+                    name,
+                    status: 'done',
+                    percent: 100,
+                    url,
+                    isImage: isImageFile(url) || isImageFile(name),
+                    hover: false,
+                    rawResult: item,
+                };
+            }
+
+            if (!item || typeof item !== 'object') return null;
+
+            const pathLike = item.url || item.path || item.fileUrl || item.file_path;
+            const url = typeof pathLike === 'string' ? pathLike : undefined;
+            const name = item.name || item.fileName || item.filename || item.title
+                || (url ? extractFileName(url) : `file-${index + 1}`);
+
+            return {
+                uid: `preset-${index}-${String(name)}`,
+                name: String(name),
+                status: 'done',
+                percent: 100,
+                url,
+                isImage: isImageFile(String(name)) || (url ? isImageFile(url) : false),
+                hover: false,
+                rawResult: item,
+            };
+        })
+        .filter((item): item is FileCard => !!item);
+}
 
 function getFileIcon(name: string): string {
     if (/\.pdf$/i.test(name)) return 'icon-file-pdf';
@@ -229,6 +292,25 @@ function validateFile(file: File): boolean {
 // 5. 并发队列
 // ==========================================
 const { addTask } = useUploadQueue(props.maxConcurrent);
+
+const previewImageList = computed(() => {
+    return fileCards.value
+        .filter(card => card.status === 'done' && card.isImage && !!card.url)
+        .map(card => card.url as string);
+});
+
+/**
+ * 外部值回填：当业务层通过 v-model 传入历史文件时，自动同步到编辑态卡片列表。
+ * 仅对 multi 模式生效（avatar 模式由 SingleUpload 处理）。
+ */
+watch(
+    () => [props.modelValue, props.listType] as const,
+    ([modelValue, listType]) => {
+        if (listType === 'avatar') return;
+        fileCards.value = normalizeModelValueToCards(modelValue as any[] | undefined);
+    },
+    { deep: true, immediate: true },
+);
 
 // ==========================================
 // 6. 自定义上传拦截（multi 模式）
@@ -280,6 +362,30 @@ function handleCustomRequest(option: RequestOption) {
 function removeCard(uid: string) {
     fileCards.value = fileCards.value.filter(c => c.uid !== uid);
     syncModelValue();
+}
+
+function previewCard(card: FileCard) {
+    if (card.isImage && card.url) {
+        const idx = previewImageList.value.findIndex(url => url === card.url);
+        previewCurrent.value = idx >= 0 ? idx : 0;
+        previewVisible.value = true;
+        return;
+    }
+
+    if (card.url) {
+        window.open(card.url, '_blank', 'noopener,noreferrer');
+        return;
+    }
+
+    Message.info('当前文件暂无可预览地址');
+}
+
+function handlePreviewVisibleChange(visible: boolean) {
+    previewVisible.value = visible;
+}
+
+function handlePreviewCurrentChange(current: number) {
+    previewCurrent.value = current;
 }
 
 function syncModelValue() {
@@ -357,6 +463,22 @@ function syncModelValue() {
     align-items: center;
     justify-content: center;
     border-radius: 6px;
+}
+
+.card-action-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    transition: all .2s ease;
+}
+
+.card-action-link:hover {
+    background: rgba(255, 255, 255, 0.24);
+    transform: translateY(-1px);
 }
 
 /* 添加按钮格 */
@@ -542,4 +664,5 @@ function syncModelValue() {
     background: rgb(var(--danger-6));
     color: #fff;
 }
+
 </style>

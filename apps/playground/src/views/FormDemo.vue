@@ -76,8 +76,8 @@ const makeDemoFormData = () => ({
     receiveNotify: true,
     keywords: ['中后台', 'ProForm', 'Schema'],
     avatar: [
-        { name: 'avatar.png', url: 'https://cdn.example.com/uploads/avatar.png' },
-        'https://cdn.example.com/uploads/id-card-front.jpg'
+        { name: 'avatar.png', url: 'https://img.liujinrong.cn/uploads/1772983718722-utvh92-about.jpg' },
+        'https://img.liujinrong.cn/uploads/1772983718722-utvh92-about.jpg'
     ],
     customTags: ['可配置', '可扩展']
 });
