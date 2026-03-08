@@ -27,6 +27,10 @@
                         <template #icon><icon-cloud-upload /></template>
                         ProUpload 演示
                     </a-menu-item>
+                    <a-menu-item key="pro-table-form">
+                        <template #icon><icon-table /></template>
+                        ProTableForm 演示
+                    </a-menu-item>
                 </a-menu>
             </a-layout-sider>
 

@@ -1,8 +1,21 @@
 <template>
     <div class="table-demo">
-        <h3 style="margin-top: 0; margin-bottom: 24px;">ProTable 综合渲染压测</h3>
-        <!-- 核心 ProTable 组件展示区 -->
-        <ProTable :columns="columns" :requestApi="fetchMockData" />
+        <h3 style="margin-top: 0; margin-bottom: 24px;">ProTable 综合渲染压测 & 列配置演示</h3>
+        
+        <a-alert type="info" style="margin-bottom: 16px;">
+            <template #title>列配置功能说明</template>
+            <div style="font-size: 12px; line-height: 1.6;">
+                点击表格右上角的「列设置」按钮，可以勾选/取消列的显隐。配置会自动保存到浏览器 localStorage，刷新页面会自动恢复。
+            </div>
+        </a-alert>
+        
+        <!-- 核心 ProTable 组件展示区：增加 cacheKey 和 showSetting 开启列配置功能 -->
+        <ProTable 
+            :columns="columns" 
+            :requestApi="fetchMockData"
+            cacheKey="playground-table-demo"
+            :showSetting="true"
+        />
     </div>
 </template>
 

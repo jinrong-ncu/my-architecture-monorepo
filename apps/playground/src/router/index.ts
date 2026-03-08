@@ -30,6 +30,12 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'UploadDemo',
                 component: () => import('../views/UploadDemo.vue'),
                 meta: { title: 'ProUpload 演示' }
+            },
+            {
+                path: 'pro-table-form',
+                name: 'ProTableFormDemo',
+                component: () => import('../views/pro-table-form/index.vue'),
+                meta: { title: 'ProTableForm 演示' }
             }
         ]
     }

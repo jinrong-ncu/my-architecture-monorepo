@@ -1,5 +1,43 @@
 <template>
     <div class="rongshiyi-pro-table">
+        <!-- 工具栏：列设置按钮 -->
+        <div class="pro-table-toolbar" v-if="props.showSetting !== false">
+            <a-popover placement="bottom" :width="280">
+                <a-button type="outline" size="small">
+                    <template #icon><icon-settings /></template>
+                    列设置
+                </a-button>
+
+                <template #content>
+                    <div class="pro-table-setting-panel">
+                        <!-- 列表 -->
+                        <div class="setting-content" v-if="currentColumns.length > 0">
+                            <a-checkbox-group
+                                :model-value="currentColumns.filter(c => c.visible !== false).map(c => c.dataIndex)"
+                                @update:model-value="handleColumnVisibilityChange"
+                            >
+                                <a-checkbox v-for="col in currentColumns" :key="col.dataIndex" :value="col.dataIndex">
+                                    {{ col.title }}
+                                </a-checkbox>
+                            </a-checkbox-group>
+                        </div>
+
+                        <a-empty v-else description="暂无可配置列" />
+
+                        <!-- 分割线 -->
+                        <a-divider style="margin: 8px 0;" v-if="currentColumns.length > 0" />
+
+                        <!-- 重置按钮 -->
+                        <div class="setting-actions" v-if="currentColumns.length > 0">
+                            <a-button type="text" size="small" @click="resetColumnsToDefault">
+                                重置默认
+                            </a-button>
+                        </div>
+                    </div>
+                </template>
+            </a-popover>
+        </div>
+
         <!-- 顶部搜索表单区域 -->
         <div class="pro-table-search" v-if="searchColumns.length > 0">
             <a-form :model="searchModel" layout="horizontal" auto-label-width @submit="handleSearch">
@@ -43,7 +81,7 @@
                 @page-change="handlePageChange" @page-size-change="handlePageSizeChange">
 
                 <template #columns>
-                    <a-table-column v-for="col in tableColumns" :key="col.dataIndex" :title="col.title"
+                    <a-table-column v-for="col in displayColumns" :key="col.dataIndex" :title="col.title"
                         :data-index="col.dataIndex" :width="col.width" :align="col.align" :fixed="col.fixed">
 
                         <!-- 拦截表头插槽：实现 tooltip 增强 -->
@@ -174,7 +212,7 @@
                 <!-- 其他非列相关的插槽（如 empty 等）原样击穿给 a-table -->
                 <template v-for="(_, slotName) in $slots" #[slotName]="slotProps" :key="slotName">
                     <!-- 过滤掉已手动处理的插槽 -->
-                    <slot v-if="!tableColumns.find(c => c.slotName === slotName) && slotName !== 'th'" :name="slotName"
+                    <slot v-if="!displayColumns.find(c => c.slotName === slotName) && slotName !== 'th'" :name="slotName"
                         v-bind="slotProps || {}"></slot>
                 </template>
             </a-table>
@@ -185,9 +223,16 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { Message } from '@arco-design/web-vue';
-import { IconQuestionCircle, IconCopy, IconMore } from '@arco-design/web-vue/es/icon';
+import { IconQuestionCircle, IconCopy, IconMore, IconSettings } from '@arco-design/web-vue/es/icon';
 import dayjs from 'dayjs';
 import type { ProTableProps, ProColumnData } from './types';
+
+/**
+ * 内部列配置扩展，增加 visible 标记
+ */
+interface ColumnWithVisibility extends ProColumnData {
+    visible?: boolean;
+}
 
 // ==========================================
 // 1. 属性定义与基础状态声明
@@ -197,6 +242,9 @@ const props = defineProps<ProTableProps>();
 const loading = ref(false);
 const tableData = ref<any[]>([]);
 const searchModel = reactive<Record<string, any>>({});
+
+// 维护当前列的可见性状态（不直接修改原始 columns）
+const currentColumns = ref<ColumnWithVisibility[]>([]);
 
 const pagination = reactive({
     current: 1,
@@ -215,8 +263,8 @@ const searchColumns = computed(() => {
 });
 
 // 重构 columns 配置，强制让带有特殊渲染逻辑的列走自定义插槽代理
-const tableColumns = computed(() => {
-    return props.columns.map((col) => {
+const tableColumnsWithSlotName = computed(() => {
+    return currentColumns.value.map((col) => {
         // 如果列配置了特殊渲染配置，但却未申明 slotName，
         // 强制打上一个 slotName 标记，从而引导 a-table 将其交由内部捕获
         const needsCustomRender = col.valueType || col.copyable;
@@ -228,6 +276,11 @@ const tableColumns = computed(() => {
         }
         return col;
     });
+});
+
+// 计算过滤后的显示列（排除 visible=false 的列）
+const displayColumns = computed(() => {
+    return tableColumnsWithSlotName.value.filter(col => col.visible !== false) as ProColumnData[];
 });
 
 // 计算自适应的滚动维度配置：如果业务没传，但是配置有 fixed 列，则提供 max-content 给 Arco 以激活固定列机制
@@ -372,9 +425,89 @@ const handlePageSizeChange = (pageSize: number) => {
 };
 
 // ==========================================
-// 4. 生命周期钩子
+// 5. 列可见性持久化管理
+// ==========================================
+
+/**
+ * 从 localStorage 读取该表格的列配置
+ */
+const loadColumnVisibilityFromCache = () => {
+    if (!props.cacheKey) return null;
+
+    try {
+        const cacheKey = `PRO_TABLE_COLUMNS_${props.cacheKey}`;
+        const cached = localStorage.getItem(cacheKey);
+        return cached ? JSON.parse(cached) : null;
+    } catch (e) {
+        console.warn('[ProTable] 读取列配置缓存失败:', e);
+        return null;
+    }
+};
+
+/**
+ * 将列配置保存到 localStorage
+ */
+const saveColumnVisibilityToCache = (visibility: Record<string, boolean>) => {
+    if (!props.cacheKey) return;
+
+    try {
+        const cacheKey = `PRO_TABLE_COLUMNS_${props.cacheKey}`;
+        localStorage.setItem(cacheKey, JSON.stringify(visibility));
+    } catch (e) {
+        console.warn('[ProTable] 保存列配置缓存失败:', e);
+    }
+};
+
+/**
+ * 初始化列配置：读缓存 -> 落地 visible 标记
+ */
+const initializeColumns = () => {
+    const cachedVisibility = loadColumnVisibilityFromCache();
+
+    currentColumns.value = props.columns.map(col => ({
+        ...(col as ColumnWithVisibility),
+        visible: cachedVisibility?.[col.dataIndex as string] !== false
+    }));
+};
+
+/**
+ * 重置列配置到初始状态（所有列可见）
+ */
+const resetColumnsToDefault = () => {
+    currentColumns.value = props.columns.map(col => ({
+        ...(col as ColumnWithVisibility),
+        visible: true
+    }));
+
+    const visibility: Record<string, boolean> = {};
+    props.columns.forEach(col => {
+        visibility[col.dataIndex as string] = true;
+    });
+    saveColumnVisibilityToCache(visibility);
+};
+
+/**
+ * 处理列可见性更新
+ */
+const handleColumnVisibilityChange = (checked: (string | number)[]) => {
+    currentColumns.value.forEach(col => {
+        col.visible = checked.includes(col.dataIndex as string | number);
+    });
+
+    // 同步保存到缓存
+    const visibility: Record<string, boolean> = {};
+    currentColumns.value.forEach(col => {
+        visibility[col.dataIndex as string] = col.visible ?? true;
+    });
+    saveColumnVisibilityToCache(visibility);
+};
+
+// ==========================================
+// 6. 生命周期钩子
 // ==========================================
 onMounted(() => {
+    // 初始化列配置
+    initializeColumns();
     // 组件初次渲染自动执行首次查询取数
     fetchData();
 });
@@ -388,6 +521,13 @@ onMounted(() => {
     border-radius: 4px;
 }
 
+.pro-table-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+    gap: 8px;
+}
+
 .pro-table-search {
     margin-bottom: 16px;
 }
@@ -397,5 +537,31 @@ onMounted(() => {
     align-items: center;
     justify-content: flex-end;
     /* 将查询按钮靠右对齐 */
+}
+
+.pro-table-setting-panel {
+    min-width: 240px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.setting-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 8px;
+}
+
+.setting-content :deep(.arco-checkbox) {
+    display: flex;
+    width: 100%;
+    padding: 4px 0;
+}
+
+.setting-actions {
+    display: flex;
+    justify-content: center;
+    padding: 0 8px;
 }
 </style>

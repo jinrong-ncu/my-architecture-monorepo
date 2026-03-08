@@ -98,4 +98,16 @@ export interface ProTableProps {
         minWidth?: number | string;
         maxHeight?: number | string;
     };
+
+    /**
+     * 列配置缓存的唯一标识 (如 'userManagement-table')
+     * 用于 localStorage key 拼接，不同表格使用不同值以隔离缓存
+     * 若不传则禁用列设置缓存功能
+     */
+    cacheKey?: string;
+
+    /**
+     * 是否显示列设置功能（默认 true）
+     */
+    showSetting?: boolean;
 }
