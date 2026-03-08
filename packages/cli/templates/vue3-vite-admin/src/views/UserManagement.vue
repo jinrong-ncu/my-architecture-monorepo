@@ -85,8 +85,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Message } from '@arco-design/web-vue';
-import { ProTable, ProForm, SingleUpload } from '@rong/ui-vue';
-import type { FormItemConfig, ProColumnData } from '@rong/ui-vue';
+import { ProTable, ProForm, SingleUpload } from 'rongshiyi-ui-vue';
+import type { FormItemConfig, ProColumnData } from 'rongshiyi-ui-vue';
 
 // ============================================================
 // 1. 类型定义

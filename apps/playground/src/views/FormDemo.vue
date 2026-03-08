@@ -39,8 +39,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ProForm } from '@rong/ui-vue';
-import { FormItemConfig, ProFormConfig, createS3Uploader } from '@rong/ui-vue';
+import { ProForm } from 'rongshiyi-ui-vue';
+import { FormItemConfig, ProFormConfig, createS3Uploader } from 'rongshiyi-ui-vue';
 const realUploadApi = createS3Uploader();
 // ==========================================
 // 1. 状态定义

@@ -1,7 +1,7 @@
 {
     "name": "{{name}}",
     "version": "1.0.0",
-    "description": "由 rong-cli 自动生成的企业级管理后台",
+    "description": "由 rongshiyi-cli 自动生成的企业级管理后台",
     "scripts": {
         "dev": "vite",
         "build": "vue-tsc --noEmit && vite build",
@@ -11,7 +11,7 @@
         "vue": "^3.3.0",
         "vue-router": "^4.2.0",
         "@arco-design/web-vue": "^2.55.0",
-        "@rong/ui-vue": "workspace:*"
+        "rongshiyi-ui-vue": "workspace:*"
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^5.0.0",

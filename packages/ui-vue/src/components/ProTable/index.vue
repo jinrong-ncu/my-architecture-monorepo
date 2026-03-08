@@ -1,5 +1,5 @@
 <template>
-    <div class="rong-pro-table">
+    <div class="rongshiyi-pro-table">
         <!-- 顶部搜索表单区域 -->
         <div class="pro-table-search" v-if="searchColumns.length > 0">
             <a-form :model="searchModel" layout="horizontal" auto-label-width @submit="handleSearch">
@@ -381,7 +381,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.rong-pro-table {
+.rongshiyi-pro-table {
     background: var(--color-bg-2);
     /* 兼容 Arco 暗色模式的基础背景配置 */
     padding: 16px;

@@ -1,5 +1,5 @@
 <template>
-    <div class="rong-pro-form">
+    <div class="rongshiyi-pro-form">
         <a-form ref="formRef" :model="formData" :layout="config?.labelPosition || 'horizontal'"
             :auto-label-width="config?.autoLabelWidth !== false" label-align="left" @submit="handleSubmit">
             <a-row :gutter="15">
@@ -360,7 +360,7 @@ defineExpose({
 </script>
 
 <style scoped>
-.rong-pro-form {
+.rongshiyi-pro-form {
     width: 100%;
 }
 

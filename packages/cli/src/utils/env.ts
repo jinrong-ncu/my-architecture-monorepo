@@ -11,9 +11,9 @@ function getCliBaseInfo() {
         const pkgContent = readFileSync(pkgPath, 'utf-8');
         const pkg = JSON.parse(pkgContent);
 
-        // 取出 bin 对象声明的第一项指令名作为 CLI 前缀（如 rong-cli / a-company-cli）
+        // 取出 bin 对象声明的第一项指令名作为 CLI 前缀（如 rongshiyi-cli / a-company-cli）
         // 实现了只改 package.json 甚至由脚本修改 pkg 前缀后代码内能自动更新
-        const commandName = pkg.bin ? Object.keys(pkg.bin)[0] : 'rong-cli';
+        const commandName = pkg.bin ? Object.keys(pkg.bin)[0] : 'rongshiyi-cli';
 
         return {
             version: pkg.version as string,
@@ -24,8 +24,8 @@ function getCliBaseInfo() {
         // 降级兼容策略，防止因目录解析失败导致脚手架彻底崩溃
         return {
             version: '1.0.0',
-            cliName: 'rong-cli',
-            cliPrefix: '[RONG-CLI]'
+            cliName: 'rongshiyi-cli',
+            cliPrefix: '[RONGSHIYI-CLI]'
         };
     }
 }

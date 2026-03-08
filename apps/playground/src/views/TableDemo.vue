@@ -7,8 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import { ProTable } from '@rong/ui-vue';
-import type { ProColumnData } from '@rong/ui-vue';
+import { ProTable } from 'rongshiyi-ui-vue';
+import type { ProColumnData } from 'rongshiyi-ui-vue';
 
 // ==========================================
 // 1. 定义表盘列基础数据配置

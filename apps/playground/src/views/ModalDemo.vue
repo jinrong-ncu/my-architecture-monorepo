@@ -47,8 +47,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ProModal, ProForm } from '@rong/ui-vue';
-import type { FormItemConfig } from '@rong/ui-vue';
+import { ProModal, ProForm } from 'rongshiyi-ui-vue';
+import type { FormItemConfig } from 'rongshiyi-ui-vue';
 
 // ==========================================
 // 1. 弹窗状态

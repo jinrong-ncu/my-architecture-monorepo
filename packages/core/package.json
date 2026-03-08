@@ -1,5 +1,5 @@
 {
-    "name": "@rong/core",
+    "name": "rongshiyi-core",
     "version": "1.0.0",
     "description": "纯 TS 逻辑企业级核心库。包含通用的 API 请求封装、工具函数、加密算法等，供 Vue/React 共享。",
     "main": "index.ts",

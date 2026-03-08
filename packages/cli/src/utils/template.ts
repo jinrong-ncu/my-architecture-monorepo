@@ -9,10 +9,10 @@ import path from 'path';
  * @param targetPath 物理写入的目标绝对路径
  */
 export async function copyTemplate(templateName: string, appName: string, targetPath: string) {
-    // 1. 计算模板在 Monorepo 库内的物理绝对路径
+    // 1. 计算模板在 cli 包内的物理绝对路径
     // 根据编译后的 dist/utils/template.js 的所在位置
-    // 向上寻找：dist(1) -> cli(2) -> packages(3) -> root(4) -> templates
-    const templateDir = path.resolve(__dirname, '../../../../templates', templateName);
+    // 向上寻找两级：dist(1) -> cli根目录(2) -> templates
+    const templateDir = path.resolve(__dirname, '../../templates', templateName);
 
     // 防御性校验：模板是否存在
     if (!fs.existsSync(templateDir)) {

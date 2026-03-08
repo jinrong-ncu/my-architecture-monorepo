@@ -12,11 +12,11 @@ export function getPkgInfo() {
         const pkgContent = readFileSync(pkgPath, 'utf-8');
         const pkg = JSON.parse(pkgContent);
 
-        // 动态提取指令名称 (如 rong-cli)
-        const commandName = pkg.bin ? Object.keys(pkg.bin)[0] : 'rong-cli';
+        // 动态提取指令名称 (如 rongshiyi-cli)
+        const commandName = pkg.bin ? Object.keys(pkg.bin)[0] : 'rongshiyi-cli';
 
         return {
-            name: pkg.name || '@rong/cli',
+            name: pkg.name || 'rongshiyi-cli',
             version: pkg.version || '1.0.0',
             commandName,
             cliPrefix: `[${commandName.toUpperCase()}]`
@@ -24,10 +24,10 @@ export function getPkgInfo() {
     } catch (err) {
         // 如果读取失败，进行降级容错以保证程序仍可运行
         return {
-            name: '@rong/cli',
+            name: 'rongshiyi-cli',
             version: '1.0.0',
-            commandName: 'rong-cli',
-            cliPrefix: '[RONG-CLI]'
+            commandName: 'rongshiyi-cli',
+            cliPrefix: '[RONGSHIYI-CLI]'
         };
     }
 }

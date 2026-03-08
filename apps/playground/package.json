@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "@arco-design/web-vue": "^2.53.0",
-        "@rong/ui-vue": "workspace:*",
+        "rongshiyi-ui-vue": "workspace:*",
         "vue": "^3.3.0",
         "vue-router": "^4.6.4"
     },

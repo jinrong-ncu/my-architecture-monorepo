@@ -1,10 +1,10 @@
 {
-    "name": "@rong/cli",
+    "name": "rongshiyi-cli",
     "version": "1.0.0",
     "description": "企业级前端脚手架核心驱动层，负责基于模板进行项目快速创建、动态组件生成与本地环境检测。",
     "main": "dist/index.js",
     "bin": {
-        "rong-cli": "dist/index.js"
+        "rongshiyi-cli": "dist/index.js"
     },
     "files": [
         "dist",

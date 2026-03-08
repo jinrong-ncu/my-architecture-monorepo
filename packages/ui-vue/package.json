@@ -1,5 +1,5 @@
 {
-    "name": "@rong/ui-vue",
+    "name": "rongshiyi-ui-vue",
     "version": "1.0.0",
     "description": "基于 Vue3 + Arco Design 的企业级高阶组件库",
     "main": "src/index.ts",
