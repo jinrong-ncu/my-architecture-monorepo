@@ -22,6 +22,15 @@
     border-inline-end: none;
 }
 
+.playground-react-menu .ant-menu-item {
+    color: #cbd5e1;
+}
+
+.playground-react-menu .ant-menu-item-selected {
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
 .playground-react-main {
     background: #f1f5f9;
 }
@@ -38,6 +47,12 @@
     margin: 0 !important;
 }
 
+.playground-react-user {
+    margin-left: auto;
+    color: #64748b;
+    font-size: 13px;
+}
+
 .playground-react-content {
     padding: 24px;
 }
@@ -46,4 +61,26 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
     gap: 16px;
+}
+
+.playground-react-form-page {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.playground-react-json-card .ant-card-body {
+    padding: 0;
+}
+
+.playground-react-json-block {
+    margin: 0;
+    padding: 16px;
+    max-height: 260px;
+    overflow: auto;
+    background: #0b1020;
+    color: #dbeafe;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 0 0 8px 8px;
 }

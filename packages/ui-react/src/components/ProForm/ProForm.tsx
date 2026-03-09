@@ -22,11 +22,17 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import type { FormItemConfig, FormItemOption, ProFormProps, ProFormRef } from './types';
 import './index.css';
 
+function isPlainObject(value: unknown): value is Record<string, any> {
+    if (Object.prototype.toString.call(value) !== '[object Object]') return false;
+    const proto = Object.getPrototypeOf(value);
+    return proto === Object.prototype || proto === null;
+}
+
 function deepMerge(dst: Record<string, any>, src: Record<string, any>) {
     Object.keys(src || {}).forEach((key) => {
         const srcValue = src[key];
-        if (srcValue !== null && typeof srcValue === 'object' && !Array.isArray(srcValue)) {
-            if (!dst[key] || typeof dst[key] !== 'object' || Array.isArray(dst[key])) {
+        if (isPlainObject(srcValue)) {
+            if (!isPlainObject(dst[key])) {
                 dst[key] = {};
             }
             deepMerge(dst[key], srcValue);

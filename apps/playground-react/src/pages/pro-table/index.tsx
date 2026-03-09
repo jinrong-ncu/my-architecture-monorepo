@@ -119,7 +119,7 @@ const columns: ProColumnType<UserItem>[] = [
     },
 ];
 
-export default function TableDemo() {
+export default function ProTablePage() {
     return (
         <ProTable<UserItem>
             cacheKey="demo-user-list-table"
