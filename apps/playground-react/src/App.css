@@ -1,0 +1,49 @@
+.playground-react-layout {
+    min-height: 100vh;
+    margin: -8px;
+}
+
+.playground-react-sider {
+    background: #0f172a;
+    border-right: 1px solid #1e293b;
+}
+
+.playground-react-logo {
+    color: #e2e8f0;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    padding: 20px 16px;
+    letter-spacing: 0.3px;
+}
+
+.playground-react-menu {
+    background: transparent;
+    border-inline-end: none;
+}
+
+.playground-react-main {
+    background: #f1f5f9;
+}
+
+.playground-react-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    padding-inline: 24px;
+}
+
+.playground-react-title {
+    margin: 0 !important;
+}
+
+.playground-react-content {
+    padding: 24px;
+}
+
+.playground-react-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 16px;
+}

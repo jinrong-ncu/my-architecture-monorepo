@@ -1,0 +1,52 @@
+.rongshiyi-pro-form {
+    width: 100%;
+}
+
+.rongshiyi-pro-form__readonly-text {
+    min-height: 32px;
+    line-height: 32px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.rongshiyi-pro-form__divider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0 8px;
+}
+
+.rongshiyi-pro-form__divider-title {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.rongshiyi-pro-form__divider-icon,
+.rongshiyi-pro-form__label-icon {
+    color: rgba(0, 0, 0, 0.45);
+}
+
+.rongshiyi-pro-form__divider-line {
+    margin: 0;
+    flex: 1;
+    min-width: 40px;
+}
+
+.rongshiyi-pro-form__message {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+    margin-top: -8px;
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.rongshiyi-pro-form__actions {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.rongshiyi-pro-form__full-width {
+    width: 100%;
+}
