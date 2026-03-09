@@ -18,6 +18,7 @@ const mockData: UserItem[] = Array.from({ length: 55 }).map((_, idx) => ({
     role: idx % 3,
     status: idx % 4 !== 0,
     joinDate: new Date(Date.now() - idx * 86400000 * 5).toISOString(),
+    avatar: `https://i.pravatar.cc/150?img=${idx + 1}`,
 }));
 
 const mockRequest = async (params: Record<string, any>) => {
@@ -55,6 +56,11 @@ const columns: ProColumnType<UserItem>[] = [
         search: true, // 在搜索表单中显示
         copyable: true, // 文本旁自动展示复制图标
         tooltip: '系统唯一识别码',
+    },
+    {
+        title: '头像',
+        dataIndex: 'avatar',
+        valueType: 'image',
     },
     {
         title: '姓名',
@@ -129,7 +135,7 @@ export default function App() {
         <div style={{ padding: '24px', backgroundColor: '#f3f4f6', minHeight: '100vh', margin: '-8px' }}>
             <ProTable<UserItem>
                 cacheKey="demo-user-list-table"
-                headerTitle="企业员工列表"
+                headerTitle=""
                 rowKey="id"
                 requestApi={mockRequest}
                 columns={columns}

@@ -223,7 +223,7 @@ export function ProTable<RecordType extends object = any>(props: ProTableProps<R
                                     else if (typeof text === 'string') srcList = [text];
 
                                     renderedNode = srcList.length > 0 ? (
-                                        <Image src={srcList[0]} height={40} preview={{ src: srcList[0] }} />
+                                        <Image src={srcList[0]} height={80} preview={{ src: srcList[0] }} />
                                     ) : <span style={{ color: '#999' }}>暂无图片</span>;
                                 }
                                 break;
