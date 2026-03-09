@@ -110,8 +110,16 @@
 
                                 <!-- valueType === 'image' -->
                                 <template v-else-if="col.valueType === 'image'">
-                                    <a-image v-if="record[col.dataIndex || '']" :src="record[col.dataIndex || '']"
-                                        height="40" preview />
+                                    <template v-if="getImageListFromValue(record[col.dataIndex || '']).length > 0">
+                                        <div class="pro-table-image-preview-wrap"
+                                            @click="handleImagePreview(record[col.dataIndex || ''])">
+                                            <a-image :src="getImageListFromValue(record[col.dataIndex || ''])[0]" height="80"
+                                                :preview="false" />
+                                            <div class="pro-table-image-preview-mask">
+                                                <icon-eye class="pro-table-image-preview-icon" />
+                                            </div>
+                                        </div>
+                                    </template>
                                     <span v-else style="color: var(--color-text-4)">暂无图片</span>
                                 </template>
 
@@ -216,6 +224,11 @@
                         v-bind="slotProps || {}"></slot>
                 </template>
             </a-table>
+
+            <a-image-preview-group :src-list="imagePreviewList" :visible="imagePreviewVisible"
+                :current="imagePreviewCurrent" :infinite="true"
+                @update:visible="(visible:boolean)=>imagePreviewVisible=visible"
+                @update:current="(current:number)=>imagePreviewCurrent=current" />
         </div>
     </div>
 </template>
@@ -223,7 +236,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { Message } from '@arco-design/web-vue';
-import { IconQuestionCircle, IconCopy, IconMore, IconSettings } from '@arco-design/web-vue/es/icon';
+import { IconQuestionCircle, IconCopy, IconMore, IconSettings, IconEye } from '@arco-design/web-vue/es/icon';
 import dayjs from 'dayjs';
 import type { ProTableProps, ProColumnData } from './types';
 
@@ -242,6 +255,9 @@ const props = defineProps<ProTableProps>();
 const loading = ref(false);
 const tableData = ref<any[]>([]);
 const searchModel = reactive<Record<string, any>>({});
+const imagePreviewVisible = ref(false);
+const imagePreviewCurrent = ref(0);
+const imagePreviewList = ref<string[]>([]);
 
 // 维护当前列的可见性状态（不直接修改原始 columns）
 const currentColumns = ref<ColumnWithVisibility[]>([]);
@@ -356,6 +372,28 @@ const handleCopy = async (text: string) => {
     } catch (err) {
         Message.error('复制失败，请检查浏览器权限');
     }
+};
+
+const getImageListFromValue = (value: any): string[] => {
+    if (!value) return [];
+    if (Array.isArray(value)) {
+        return value.filter(item => typeof item === 'string' && item.trim().length > 0);
+    }
+    if (typeof value === 'string' && value.trim().length > 0) {
+        return [value];
+    }
+    return [];
+};
+
+const handleImagePreview = (value: any) => {
+    const imageList = getImageListFromValue(value);
+    if (imageList.length === 0) {
+        Message.info('暂无可预览图片');
+        return;
+    }
+    imagePreviewList.value = imageList;
+    imagePreviewCurrent.value = 0;
+    imagePreviewVisible.value = true;
 };
 
 // ==========================================
@@ -563,5 +601,33 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     padding: 0 8px;
+}
+
+.pro-table-image-preview-wrap {
+    position: relative;
+    display: inline-flex;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.pro-table-image-preview-mask {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .2s ease;
+}
+
+.pro-table-image-preview-wrap:hover .pro-table-image-preview-mask {
+    opacity: 1;
+}
+
+.pro-table-image-preview-icon {
+    color: #fff;
+    font-size: 16px;
 }
 </style>

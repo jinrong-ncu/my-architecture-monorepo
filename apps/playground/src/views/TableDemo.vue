@@ -39,7 +39,7 @@ const columns: ProColumnData[] = [
     {
         title: '头像照片',
         dataIndex: 'avatar',
-        width: 80,
+        width: 120,
         valueType: 'image'
     },
     {
