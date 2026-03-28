@@ -1,5 +1,5 @@
 {
-    "name": "@rong/playground",
+    "name": "@rong/playground-vue-arco",
     "version": "1.0.0",
     "private": true,
     "description": "基于 Vite + Vue3 的本地测试沙箱，用于联调测试框架组件包。",
@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "@arco-design/web-vue": "^2.53.0",
-        "rongshiyi-ui-vue": "workspace:*",
+        "rongshiyi-ui-vue-arco": "workspace:*",
         "vue": "^3.3.0",
         "vue-router": "^4.6.4"
     },

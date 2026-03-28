@@ -1,5 +1,5 @@
 {
-    "name": "rongshiyi-ui-react",
+    "name": "rongshiyi-ui-react-antd",
     "version": "1.0.0",
     "description": "React UI components for the monorepo based on Ant Design",
     "main": "src/index.ts",

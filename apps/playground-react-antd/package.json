@@ -1,5 +1,5 @@
 {
-    "name": "@rongshiyi/playground-react",
+    "name": "@rongshiyi/playground-react-antd",
     "private": true,
     "version": "1.0.0",
     "type": "module",
@@ -14,7 +14,7 @@
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-router-dom": "^6.30.3",
-        "rongshiyi-ui-react": "workspace:*"
+        "rongshiyi-ui-react-antd": "workspace:*"
     },
     "devDependencies": {
         "@types/react": "^18.2.55",
