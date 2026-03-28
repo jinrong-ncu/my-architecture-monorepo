@@ -25,8 +25,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ProTableForm } from 'rongshiyi-ui-vue';
-import type { ProTableFormColumn, ProTableFormExpose } from 'rongshiyi-ui-vue';
+import { ProTableForm } from 'rongshiyi-ui-vue-arco';
+import type { ProTableFormColumn, ProTableFormExpose } from 'rongshiyi-ui-vue-arco';
 
 const tableFormRef = ref<ProTableFormExpose>();
 

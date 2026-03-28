@@ -20,8 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import { ProTable } from 'rongshiyi-ui-vue';
-import type { ProColumnData } from 'rongshiyi-ui-vue';
+import { ProTable } from 'rongshiyi-ui-vue-arco';
+import type { ProColumnData } from 'rongshiyi-ui-vue-arco';
 
 // ==========================================
 // 1. 定义表盘列基础数据配置

@@ -36,6 +36,12 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'ProTableFormDemo',
                 component: () => import('../views/pro-table-form/index.vue'),
                 meta: { title: 'ProTableForm 演示' }
+            },
+            {
+                path: 'query-builder',
+                name: 'QueryBuilderDemo',
+                component: () => import('../views/QueryBuilderDemo.vue'),
+                meta: { title: 'ProQueryBuilder 演示' }
             }
         ]
     }

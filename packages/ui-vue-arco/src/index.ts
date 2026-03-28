@@ -13,10 +13,13 @@ import type { FormItemConfig, ProFormConfig, ProFormProps } from './components/P
 import ProModal from './components/ProModal/index.vue';
 import type { ProModalProps } from './components/ProModal/types';
 
+import ProQueryBuilder from './components/ProQueryBuilder/index.vue';
+import type { RuleGroup, RuleItem, FieldOption } from './components/ProQueryBuilder/types';
+
 import { SingleUpload, MultipleUpload, ProUpload, useUploadQueue, useOSS, createS3Uploader } from './components/ProUpload/index';
 import type { OSSConfig, S3UploaderConfig } from './components/ProUpload/index';
 
-export { ProLayout, ProTable, ProTableForm, ProForm, ProModal, SingleUpload, MultipleUpload, ProUpload, useUploadQueue, useOSS, createS3Uploader };
+export { ProLayout, ProTable, ProTableForm, ProForm, ProModal, ProQueryBuilder, SingleUpload, MultipleUpload, ProUpload, useUploadQueue, useOSS, createS3Uploader };
 export type {
 	ProLayoutProps,
 	ProLayoutMenuItem,
@@ -35,4 +38,7 @@ export type {
 	ProModalProps,
 	OSSConfig,
 	S3UploaderConfig,
+	RuleGroup,
+	RuleItem,
+	FieldOption,
 };

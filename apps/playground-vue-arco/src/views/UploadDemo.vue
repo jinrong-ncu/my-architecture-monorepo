@@ -74,7 +74,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ProUpload, createS3Uploader } from 'rongshiyi-ui-vue';
+import { ProUpload, createS3Uploader } from 'rongshiyi-ui-vue-arco';
 
 // ==========================================
 // 绑定数据

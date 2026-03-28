@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, message } from 'antd';
-import { ProForm } from 'rongshiyi-ui-react';
-import type { FormItemConfig } from 'rongshiyi-ui-react';
+import { ProForm } from 'rongshiyi-ui-react-antd';
+import type { FormItemConfig } from 'rongshiyi-ui-react-antd';
 
 const formItems: FormItemConfig[] = [
     {

@@ -22,8 +22,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { ProLayout } from 'rongshiyi-ui-vue';
-import type { ProLayoutMenuItem } from 'rongshiyi-ui-vue';
+import { ProLayout } from 'rongshiyi-ui-vue-arco';
+import type { ProLayoutMenuItem } from 'rongshiyi-ui-vue-arco';
 import {
     IconLayers,
     IconEdit,
@@ -57,6 +57,7 @@ const mockMenus = ref<ProLayoutMenuItem[]>([
                 children: [
                     { key: '/table', title: 'ProTable', icon: IconLayers },
                     { key: '/pro-table-form', title: 'ProTableForm', icon: IconUnorderedList },
+                    { key: '/query-builder', title: 'ProQueryBuilder', icon: IconLayers },
                 ],
             },
             {
@@ -76,7 +77,7 @@ const mockMenus = ref<ProLayoutMenuItem[]>([
 // 取路由的 path 尾部字符串作为和 menu-item key 一致的判断依据
 const selectedKeys = computed(() => [route.path]);
 const getDefaultOpenKeysByRoute = (path: string) => {
-    if (path === '/table' || path === '/pro-table-form') {
+    if (path === '/table' || path === '/pro-table-form' || path === '/query-builder') {
         return ['/components', '/components/table'];
     }
     if (path === '/form' || path === '/modal' || path === '/upload') {

@@ -1,6 +1,6 @@
 import { Button, message, Tag } from 'antd';
-import { ProTable } from 'rongshiyi-ui-react';
-import type { ProColumnType } from 'rongshiyi-ui-react';
+import { ProTable } from 'rongshiyi-ui-react-antd';
+import type { ProColumnType } from 'rongshiyi-ui-react-antd';
 
 interface UserItem {
     id: string;

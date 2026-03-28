@@ -54,8 +54,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ProForm } from 'rongshiyi-ui-vue';
-import { FormItemConfig, ProFormConfig, createS3Uploader } from 'rongshiyi-ui-vue';
+import { ProForm } from 'rongshiyi-ui-vue-arco';
+import { FormItemConfig, ProFormConfig, createS3Uploader } from 'rongshiyi-ui-vue-arco';
 const realUploadApi = createS3Uploader();
 
 const makeDemoFormData = () => ({

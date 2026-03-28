@@ -119,7 +119,7 @@ async function bridgeTemplates(oldName: string, newName: string): Promise<Snapsh
 
     // 2. 扫描所有模板的源码文件 (vue, ts, js) 替换 import 路径
     const srcFiles = await collectFiles(TEMPLATES_DIR, ['.vue', '.ts', '.js', '.tsx']);
-    // 匹配 from 'rongshiyi-ui-vue' 或 from "rongshiyi-ui-vue"
+    // 匹配 from 'rongshiyi-ui-vue-arco 或 from "rongshiyi-ui-vue"
     const importRegex = new RegExp(`(['"])${oldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(['"])`, 'g');
 
     for (const file of srcFiles) {
