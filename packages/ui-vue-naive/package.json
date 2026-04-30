@@ -1,0 +1,16 @@
+{
+    "name": "@my-org/ui-vue-naive",
+    "version": "1.0.0",
+    "description": "基于 Vue3 + Naive UI 的高阶组件库",
+    "main": "src/components/ProForm/index.ts",
+    "types": "src/components/ProForm/index.ts",
+    "peerDependencies": {
+        "naive-ui": "^2.38.0",
+        "vue": "^3.3.0"
+    },
+    "devDependencies": {
+        "naive-ui": "^2.38.0",
+        "@vitejs/plugin-vue": "^4.6.2",
+        "vue": "^3.3.0"
+    }
+}
