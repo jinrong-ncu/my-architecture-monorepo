@@ -212,6 +212,18 @@
                                     <n-dynamic-tags v-model:value="getModelRef(item).value" :disabled="item.options?.disabled" v-bind="getRestOptions(item)" />
                                 </template>
 
+                                <!-- upload 文件上传（通过简单版 ProUpload 封装） -->
+                                <template v-else-if="item.component === 'upload'">
+                                    <ProUpload 
+                                        v-model="getModelRef(item).value"
+                                        :list-type="item.options?.listType || 'text'"
+                                        :accept="item.options?.accept"
+                                        :limit="item.options?.limit"
+                                        :api-obj="item.options?.apiObj"
+                                        :disabled="item.options?.disabled"
+                                    />
+                                </template>
+
                                 <!-- 兜底：任何未识别 component 字符串 => 渲染具名插槽 -->
                                 <template v-else>
                                     <slot
@@ -249,6 +261,7 @@ import {
 } from 'naive-ui';
 import type { FormInst, FormRules } from 'naive-ui';
 import type { FormItemConfig, ProFormProps } from './types';
+import ProUpload from '../ProUpload/index.vue';
 
 // ==========================================
 // 1. Props & Emits
